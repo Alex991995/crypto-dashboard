@@ -1,0 +1,40 @@
+<section class="container">
+  <div
+    class="mt-5 position-relative"
+    #rootRef
+    [style]="{
+      height: rowHeight() * visibleRows() + 1 + 'px',
+      overflow: 'auto'
+    }"
+  >
+    @if(loading()){
+    <app-loader />
+
+    } @else {
+    <div [style.height]="getTopHeight + 'px'"></div>
+
+    <table class="table table-striped table-hover table-bordered">
+      <thead class="">
+        <tr>
+          <th>Symbol</th>
+          <th>Last price</th>
+          <th>Price change</th>
+          <th>Volume</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        @for (cryptoPairs of statisticsCryptoPairs() | slice: start() : start()
+        + visibleRows() + 1; track cryptoPairs.firstId) {
+        <tr>
+          <th>{{ cryptoPairs.symbol }}</th>
+          <td>{{ cryptoPairs.lastPrice }}</td>
+          <td>{{ cryptoPairs.priceChangePercent }}</td>
+          <td>{{ cryptoPairs.volume }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <div [style.height]="getBottomHeight + 'px'"></div>
+    }
+  </div>
+</section>
