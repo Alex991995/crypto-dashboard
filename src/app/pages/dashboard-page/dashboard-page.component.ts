@@ -7,6 +7,7 @@ import {
   signal,
   ViewChild,
   viewChild,
+  ViewChildren,
 } from '@angular/core';
 import { ApiService } from '@core/services/api.service';
 import { ErrorServiceService } from '@core/services/error-service.service';
@@ -14,6 +15,7 @@ import { IStatistic } from 'app/interfaces';
 import { first, fromEvent, map, take } from 'rxjs';
 import { Loader } from '@components/loader/loader.component';
 import { SlicePipe } from '@angular/common';
+import { columnSort } from '@pages/model';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -28,6 +30,8 @@ export class DashboardPageComponent implements OnInit {
   protected statisticsCryptoPairs = signal<IStatistic[]>([]);
   protected loading = signal(false);
   @ViewChild('rootRef') rootRef!: ElementRef<HTMLDivElement>;
+  @ViewChildren('thead', { read: ElementRef })
+  theads!: ElementRef<HTMLTableCellElement>;
 
   start = signal(0);
   rowHeight = signal(40);
@@ -45,6 +49,7 @@ export class DashboardPageComponent implements OnInit {
     this.apiService.getStatistics().subscribe({
       next: (value) => {
         this.statisticsCryptoPairs.set(value);
+        console.log(value);
         this.loading.set(false);
       },
       error: (err) => {
@@ -52,6 +57,19 @@ export class DashboardPageComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  sortTable(column: columnSort) {
+    console.log(this.theads.nativeElement);
+    const copy = [...this.statisticsCryptoPairs()];
+    if (column === 'symbol') {
+      copy.sort((a, b) => a.symbol.localeCompare(b.symbol));
+      this.statisticsCryptoPairs.set(copy);
+      return;
+    }
+
+    copy.sort((a, b) => +b[column] - +a[column]);
+    this.statisticsCryptoPairs.set(copy);
   }
 
   get getTopHeight() {
