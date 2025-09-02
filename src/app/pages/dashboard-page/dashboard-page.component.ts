@@ -19,10 +19,11 @@ import { SlicePipe } from '@angular/common';
 import { columnSort } from '@pages/model';
 
 import { CommonModule } from '@angular/common';
+import { InputDashboard } from '@components/input-dashboard/input-dashboard-component';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [Loader, SlicePipe, CommonModule],
+  imports: [Loader, SlicePipe, CommonModule, InputDashboard],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
 })
@@ -66,13 +67,6 @@ export class DashboardPageComponent implements OnInit {
   }
 
   sortTable(column: columnSort) {
-    this.theadsRef.forEach((th) => {
-      if (th.nativeElement.dataset['sort'] === column) {
-        // console.log(th.nativeElement);
-      } else {
-        console.log(th.nativeElement.dataset['sort'] === column);
-      }
-    });
     const copy = [...this.statisticsCryptoPairs()];
     if (column === 'symbol') {
       copy.sort((a, b) => a.symbol.localeCompare(b.symbol));

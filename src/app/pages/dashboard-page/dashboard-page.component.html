@@ -1,4 +1,7 @@
 <section class="container">
+  <div class="d-flex">
+    <app-input-dashboard [statisticsCryptoPairs]="statisticsCryptoPairs()" />
+  </div>
   <div
     class="mt-5 position-relative"
     #rootRef
@@ -17,9 +20,9 @@
       <thead>
         <tr>
           <th #thead data-sort="symbol" (click)="sortTable('symbol')">
-            Symbol @if(thead.dataset['sort'] === 'symbol'){
+            Symbol
+
             <i class="bi bi-caret-up-fill"></i>
-            } @else { <i class="bi bi-caret-up-fill"></i>}
           </th>
           <th #thead data-sort="lastPrice" (click)="sortTable('lastPrice')">
             Last price <i class="bi bi-caret-up-fill"></i>
