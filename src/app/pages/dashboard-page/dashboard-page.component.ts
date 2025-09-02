@@ -4,6 +4,7 @@ import {
   ElementRef,
   inject,
   OnInit,
+  QueryList,
   signal,
   ViewChild,
   viewChild,
@@ -17,9 +18,11 @@ import { Loader } from '@components/loader/loader.component';
 import { SlicePipe } from '@angular/common';
 import { columnSort } from '@pages/model';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-dashboard-page',
-  imports: [Loader, SlicePipe],
+  imports: [Loader, SlicePipe, CommonModule],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
 })
@@ -30,12 +33,15 @@ export class DashboardPageComponent implements OnInit {
   protected statisticsCryptoPairs = signal<IStatistic[]>([]);
   protected loading = signal(false);
   @ViewChild('rootRef') rootRef!: ElementRef<HTMLDivElement>;
-  @ViewChildren('thead', { read: ElementRef })
-  theads!: ElementRef<HTMLTableCellElement>;
+  @ViewChildren('thead') theadsRef!: QueryList<
+    ElementRef<HTMLTableCellElement>
+  >;
 
   start = signal(0);
   rowHeight = signal(40);
   visibleRows = signal(10);
+
+  isS = signal(false);
 
   ngAfterViewInit() {
     fromEvent(this.rootRef.nativeElement, 'scroll').subscribe((res) => {
@@ -60,7 +66,13 @@ export class DashboardPageComponent implements OnInit {
   }
 
   sortTable(column: columnSort) {
-    console.log(this.theads.nativeElement);
+    this.theadsRef.forEach((th) => {
+      if (th.nativeElement.dataset['sort'] === column) {
+        // console.log(th.nativeElement);
+      } else {
+        console.log(th.nativeElement.dataset['sort'] === column);
+      }
+    });
     const copy = [...this.statisticsCryptoPairs()];
     if (column === 'symbol') {
       copy.sort((a, b) => a.symbol.localeCompare(b.symbol));

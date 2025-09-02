@@ -16,16 +16,22 @@
     <table class="table table-striped table-hover table-bordered">
       <thead>
         <tr>
-          <th #thead (click)="sortTable('symbol')">
-            Symbol<i class="bi bi-caret-up-fill"></i>
+          <th #thead data-sort="symbol" (click)="sortTable('symbol')">
+            Symbol @if(thead.dataset['sort'] === 'symbol'){
+            <i class="bi bi-caret-up-fill"></i>
+            } @else { <i class="bi bi-caret-up-fill"></i>}
           </th>
-          <th #thead (click)="sortTable('lastPrice')">
+          <th #thead data-sort="lastPrice" (click)="sortTable('lastPrice')">
             Last price <i class="bi bi-caret-up-fill"></i>
           </th>
-          <th #thead (click)="sortTable('priceChangePercent')">
+          <th
+            #thead
+            data-sort="priceChangePercent"
+            (click)="sortTable('priceChangePercent')"
+          >
             Price change <i class="bi bi-caret-up-fill"></i>
           </th>
-          <th #thead (click)="sortTable('volume')">
+          <th #thead data-sort="volume" (click)="sortTable('volume')">
             Volume <i class="bi bi-caret-up-fill"></i>
           </th>
         </tr>
