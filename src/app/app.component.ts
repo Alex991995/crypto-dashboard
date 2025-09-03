@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -14,10 +14,10 @@ import { ErrorModalComponent } from '@components/modal/error-modal/error-modal.c
 export class AppComponent {
   private errorServiceService = inject(ErrorServiceService);
   private modalService = inject(NgbModal);
-  protected error = this.errorServiceService.error();
+  protected error = computed(() => this.errorServiceService.error());
 
   ngAfterViewInit(): void {
-    if (this.error) {
+    if (this.error()) {
       this.modalService.open(ErrorModalComponent);
     }
   }

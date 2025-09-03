@@ -20,29 +20,43 @@ import { columnSort } from '@pages/model';
 
 import { CommonModule } from '@angular/common';
 import { InputDashboard } from '@components/input-dashboard/input-dashboard-component';
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { tableHeaders } from 'app/shared/constants/table-headers';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [Loader, SlicePipe, CommonModule, InputDashboard],
+  imports: [
+    Loader,
+    SlicePipe,
+    CommonModule,
+    InputDashboard,
+    ReactiveFormsModule,
+  ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
 })
 export class DashboardPageComponent implements OnInit {
+  @ViewChild('rootRef') rootRef!: ElementRef<HTMLDivElement>;
   private apiService = inject(ApiService);
   private errorServiceService = inject(ErrorServiceService);
 
   protected statisticsCryptoPairs = signal<IStatistic[]>([]);
+  protected initialStatisticsCryptoPairs = signal<IStatistic[]>([]);
   protected loading = signal(false);
-  @ViewChild('rootRef') rootRef!: ElementRef<HTMLDivElement>;
-  @ViewChildren('thead') theadsRef!: QueryList<
-    ElementRef<HTMLTableCellElement>
-  >;
+  protected tableHeaders = signal(tableHeaders);
+  protected start = signal(0);
+  protected rowHeight = signal(40);
+  protected visibleRows = signal(10);
 
-  start = signal(0);
-  rowHeight = signal(40);
-  visibleRows = signal(10);
-
-  isS = signal(false);
+  filtersGroup = new FormGroup({
+    checkboxes: new FormArray([new FormControl(false)]),
+  });
 
   ngAfterViewInit() {
     fromEvent(this.rootRef.nativeElement, 'scroll').subscribe((res) => {
@@ -56,6 +70,7 @@ export class DashboardPageComponent implements OnInit {
     this.apiService.getStatistics().subscribe({
       next: (value) => {
         this.statisticsCryptoPairs.set(value);
+        this.initialStatisticsCryptoPairs.set(value);
         console.log(value);
         this.loading.set(false);
       },
@@ -66,16 +81,47 @@ export class DashboardPageComponent implements OnInit {
     });
   }
 
-  sortTable(column: columnSort) {
+  handlerCheckboxEvent() {
+    const copy = [...this.statisticsCryptoPairs()];
+    const checkboxes = this.filtersGroup.controls.checkboxes;
+    if (checkboxes.value[0]) {
+      copy.sort((a, b) => +b.count - +a.count);
+      this.statisticsCryptoPairs.set(copy);
+      return;
+    }
+    this.statisticsCryptoPairs.set(this.initialStatisticsCryptoPairs());
+  }
+
+  resetAllSortedColumn() {
+    this.tableHeaders().forEach((h) => (h.isSorted = false));
+  }
+
+  protected sortTable(column: columnSort) {
+    this.filtersGroup.controls.checkboxes.setValue([false]);
+    this.resetAllSortedColumn();
     const copy = [...this.statisticsCryptoPairs()];
     if (column === 'symbol') {
       copy.sort((a, b) => a.symbol.localeCompare(b.symbol));
       this.statisticsCryptoPairs.set(copy);
+      this.tableHeaders().forEach((h) => {
+        if (h.columnName === 'symbol') {
+          h.isSorted = true;
+        }
+      });
       return;
     }
 
     copy.sort((a, b) => +b[column] - +a[column]);
+    this.tableHeaders().forEach((h) => {
+      if (h.columnName === column) {
+        h.isSorted = true;
+      }
+    });
     this.statisticsCryptoPairs.set(copy);
+  }
+
+  protected chosenSortedIcon(isSorted: boolean) {
+    return isSorted ? 'bi bi-caret-down-fill' : 'bi bi-caret-up-fill';
   }
 
   get getTopHeight() {

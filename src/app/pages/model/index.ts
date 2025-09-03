@@ -3,3 +3,9 @@ export type columnSort =
   | 'lastPrice'
   | 'priceChangePercent'
   | 'volume';
+
+export interface ITableHeaders {
+  text: string;
+  columnName: columnSort;
+  isSorted: boolean;
+}

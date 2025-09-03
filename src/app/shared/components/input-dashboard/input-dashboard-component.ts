@@ -6,7 +6,7 @@ import { IStatistic } from 'app/interfaces';
   template: `<div class="box-input my-3">
     <input class="form-control" list="crypto" placeholder="Type to search..." />
     <datalist id="crypto">
-      @for (cryptoPairs of statisticsCryptoPairs(); track cryptoPairs.firstId) {
+      @for (cryptoPairs of statisticsCryptoPairs(); track cryptoPairs.lastId) {
       <option [value]="cryptoPairs.symbol">{{ cryptoPairs.symbol }}</option>
       }
     </datalist>
