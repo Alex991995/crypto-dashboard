@@ -16,7 +16,7 @@ import { IStatistic } from 'app/interfaces';
 import { first, fromEvent, map, take } from 'rxjs';
 import { Loader } from '@components/loader/loader.component';
 import { SlicePipe } from '@angular/common';
-import { columnSort } from '@pages/model';
+import { columnSort } from '@pages/dashboard-page/model';
 
 import { CommonModule } from '@angular/common';
 import { InputDashboard } from '@components/input-dashboard/input-dashboard-component';
@@ -71,7 +71,6 @@ export class DashboardPageComponent implements OnInit {
       next: (value) => {
         this.statisticsCryptoPairs.set(value);
         this.initialStatisticsCryptoPairs.set(value);
-        console.log(value);
         this.loading.set(false);
       },
       error: (err) => {

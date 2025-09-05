@@ -8,4 +8,11 @@ export const routes: Routes = [
         (m) => m.DashboardPageComponent
       ),
   },
+  {
+    path: 'detail/:slug',
+    loadComponent: () =>
+      import('@pages/detail-crypto-pars/detail-crypto-pars.component').then(
+        (m) => m.DetailCryptoParsComponent
+      ),
+  },
 ];

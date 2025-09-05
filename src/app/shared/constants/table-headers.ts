@@ -1,4 +1,4 @@
-import { ITableHeaders } from '@pages/model';
+import { ITableHeaders } from '@pages/dashboard-page/model';
 
 export const tableHeaders: ITableHeaders[] = [
   {
