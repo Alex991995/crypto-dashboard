@@ -1,15 +1,13 @@
 <section class="container d-flex">
-  <div #chart></div>
-  <div>
-    <select
-      class="form-select"
-      [(ngModel)]="time"
-      (change)="change()"
-    >
-      @for (item of arrayTimeCandle(); track $index) {
-      <option [value]="item">{{ item }}</option>
+  <div class="d-flex flex-column align-items-end gap-4">
+    <div class="wrap-select">
+      <select class="form-select" [(ngModel)]="time" (change)="change()">
+        @for (item of arrayTimeCandle(); track $index) {
+        <option [value]="item">{{ item }}</option>
 
-      }
-    </select>
+        }
+      </select>
+    </div>
+    <div #chart></div>
   </div>
 </section>

@@ -4,6 +4,9 @@ import {
   CandlestickStyleOptions,
   DeepPartial,
   ISeriesApi,
+  LineData,
+  LineSeriesOptions,
+  LineStyleOptions,
   SeriesOptionsCommon,
   Time,
   WhitespaceData,
@@ -15,6 +18,14 @@ export type CandlestickType = ISeriesApi<
   CandlestickData<Time> | WhitespaceData<Time>,
   CandlestickSeriesOptions,
   DeepPartial<CandlestickStyleOptions & SeriesOptionsCommon>
+>;
+
+export type ISmaSeries = ISeriesApi<
+  'Line',
+  Time,
+  WhitespaceData<Time> | LineData<Time>,
+  LineSeriesOptions,
+  DeepPartial<LineStyleOptions & SeriesOptionsCommon>
 >;
 
 export interface ICandleChart {

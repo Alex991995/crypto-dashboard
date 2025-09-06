@@ -4,6 +4,7 @@ import {
   ElementRef,
   inject,
   OnInit,
+  output,
   QueryList,
   signal,
   ViewChild,
@@ -28,6 +29,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { tableHeaders } from 'app/shared/constants/table-headers';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -45,6 +47,7 @@ export class DashboardPageComponent implements OnInit {
   @ViewChild('rootRef') rootRef!: ElementRef<HTMLDivElement>;
   private apiService = inject(ApiService);
   private errorServiceService = inject(ErrorServiceService);
+  private router = inject(Router);
 
   protected statisticsCryptoPairs = signal<IStatistic[]>([]);
   protected initialStatisticsCryptoPairs = signal<IStatistic[]>([]);
@@ -54,7 +57,7 @@ export class DashboardPageComponent implements OnInit {
   protected rowHeight = signal(40);
   protected visibleRows = signal(10);
 
-  filtersGroup = new FormGroup({
+  public filtersGroup = new FormGroup({
     checkboxes: new FormArray([new FormControl(false)]),
   });
 
@@ -63,6 +66,10 @@ export class DashboardPageComponent implements OnInit {
       const target = res.target as HTMLElement;
       this.start.set(Math.floor(target.scrollTop / this.rowHeight()));
     });
+  }
+
+  getSymbol(symbol: string) {
+    this.router.navigate(['detail', symbol.toLocaleLowerCase()]);
   }
 
   ngOnInit() {
@@ -95,7 +102,7 @@ export class DashboardPageComponent implements OnInit {
     this.tableHeaders().forEach((h) => (h.isSorted = false));
   }
 
-  protected sortTable(column: columnSort) {
+  sortTable(column: columnSort) {
     this.filtersGroup.controls.checkboxes.setValue([false]);
     this.resetAllSortedColumn();
     const copy = [...this.statisticsCryptoPairs()];

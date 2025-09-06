@@ -1,6 +1,9 @@
 <section class="container">
   <div class="d-flex justify-content-between align-items-center">
-    <app-input-dashboard [statisticsCryptoPairs]="statisticsCryptoPairs()" />
+    <app-input-dashboard
+      [statisticsCryptoPairs]="statisticsCryptoPairs()"
+      (symbol)="getSymbol($event)"
+    />
 
     <form [formGroup]="filtersGroup">
       <ng-component formArrayName="checkboxes">
