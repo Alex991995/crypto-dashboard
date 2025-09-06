@@ -34,6 +34,7 @@ export class DetailCryptoParsComponent implements OnInit {
   protected slug = input.required<string>();
   private candleSeries = signal<CandlestickType | undefined>(undefined);
   private smaSeries = signal<ISmaSeries | undefined>(undefined);
+  private emaSeries = signal<ISmaSeries | undefined>(undefined);
   protected chartNode = viewChild.required<ElementRef<HTMLDivElement>>('chart');
   protected time = signal('1m');
   protected arrayTimeCandle = signal(arrayTimeCandle).asReadonly();
@@ -55,7 +56,13 @@ export class DetailCryptoParsComponent implements OnInit {
       lineWidth: 2,
     });
 
+    const emaSeries = chart.addSeries(LineSeries, {
+      color: 'red',
+      lineWidth: 2,
+    });
+
     this.smaSeries.set(smaSeries);
+    this.emaSeries.set(emaSeries);
     this.candleSeries.set(candleSeries);
     this.runWebsocket();
   }
@@ -84,7 +91,11 @@ export class DetailCryptoParsComponent implements OnInit {
         masData.push({ close: +msg.c, time: msg.t as UTCTimestamp });
 
         const smaValues = this.calculateMovingAverageSeriesData(masData, 1);
+
+        const emaValues = this.calculateEMA(masData, 1);
         const lastSma = smaValues[smaValues.length - 1];
+        const lastEma = emaValues[emaValues.length - 1];
+        this.emaSeries()?.update(lastEma);
         this.smaSeries()?.update(lastSma);
         this.candleSeries()?.update(candle);
       });
@@ -95,7 +106,6 @@ export class DetailCryptoParsComponent implements OnInit {
 
     for (let i = 0; i < candleData.length; i++) {
       if (i < maLength) {
-        // Provide whitespace data points until the MA can be calculated
         maData.push({ time: candleData[i].time as UTCTimestamp });
       } else {
         let sum = 0;
@@ -113,20 +123,29 @@ export class DetailCryptoParsComponent implements OnInit {
     return maData;
   }
 
-  // calculateEMA(data: number[], period: number): number[] {
-  //   const result: number[] = [];
-  //   const k = 2 / (period + 1);
-  //   let emaPrev = data[0];
-  //   result.push(emaPrev);
+  calculateEMA(candles: ICandle[], length: number): LineData<UTCTimestamp>[] {
+    if (candles.length < length) {
+      return [];
+    }
+    const k = 2 / (length + 1);
+    let emaPrev = candles[0].close;
+    const emaData: LineData<UTCTimestamp>[] = [];
 
-  //   for (let i = 1; i < data.length; i++) {
-  //     const ema = data[i] * k + emaPrev * (1 - k);
-  //     result.push(ema);
-  //     emaPrev = ema;
-  //   }
+    for (let i = 0; i < candles.length; i++) {
+      const close = candles[i].close;
+      if (i === 0) {
+        emaPrev = close;
+      } else {
+        emaPrev = close * k + emaPrev * (1 - k);
+      }
+      emaData.push({
+        time: candles[i].time as UTCTimestamp,
+        value: emaPrev,
+      });
+    }
 
-  //   return result;
-  // }
+    return emaData;
+  }
 }
 
 interface ICandle {
