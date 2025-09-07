@@ -28,11 +28,41 @@ export type ISmaSeries = ISeriesApi<
   DeepPartial<LineStyleOptions & SeriesOptionsCommon>
 >;
 
+export interface IWebSocketData<T> {
+  stream: string;
+  data: T;
+}
+
+export interface IOrderBooK {
+  e: string;
+  E: number;
+  T: number;
+  s: string;
+  U: number;
+  u: number;
+  pu: number;
+  b: string[][];
+  a: string[][];
+}
+
 export interface ICandleChart {
   e: string;
   E: number;
   s: string;
   k: K;
+}
+
+export interface IAggTrade {
+  e: string;
+  E: number;
+  a: number;
+  s: string;
+  p: string;
+  q: string;
+  f: number;
+  l: number;
+  T: number;
+  m: boolean;
 }
 
 export interface K {
@@ -53,4 +83,9 @@ export interface K {
   V: string;
   Q: string;
   B: string;
+}
+
+export interface ICandle {
+  time: number;
+  close: number;
 }
