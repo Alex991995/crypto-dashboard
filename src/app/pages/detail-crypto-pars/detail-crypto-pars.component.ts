@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   ElementRef,
   inject,
@@ -17,6 +18,7 @@ import {
   ICandleChart,
   IOrderBooK,
   ISmaSeries,
+  IStatisticsPrice24h,
   IWebSocketData,
   K,
 } from './model';
@@ -32,11 +34,16 @@ import { arrayTimeCandle } from 'app/shared/constants/arrayTimeCandle';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { calculateEMA } from './helpers/calculate-ema';
 import { calculateMovingAverageSeriesData } from './helpers/calculate-moving-average-series-data';
-import { DatePipe } from '@angular/common';
+import { AggTableTransactionComponent } from 'app/features/detail-tables/agg-table-transaction/agg-table-transaction.component';
+import { StatisticsPriceTableComponent } from 'app/features/detail-tables/statistics-price-table/statistics-price-table.component';
 
 @Component({
   selector: 'app-detail-crypto-pars',
-  imports: [FormsModule, DatePipe],
+  imports: [
+    FormsModule,
+    AggTableTransactionComponent,
+    StatisticsPriceTableComponent,
+  ],
   templateUrl: './detail-crypto-pars.component.html',
   styleUrl: './detail-crypto-pars.component.scss',
 })
@@ -52,7 +59,15 @@ export class DetailCryptoParsComponent implements OnInit {
   protected arrayTimeCandle = signal(arrayTimeCandle).asReadonly();
 
   protected arrayAsks = signal<string[][]>([]);
-  protected aggData = signal<IAggTrade | undefined>(undefined);
+  public aggData = signal<IAggTrade | undefined>(undefined);
+  protected statisticsPrice24h = signal<IStatisticsPrice24h | undefined>(
+    undefined
+  );
+
+  private streamCandle = computed(() => `${this.slug()}@kline_${this.time()}`);
+  private streamOrderBook = computed(() => `${this.slug()}@depth20@100ms`);
+  private streamAggTrade = computed(() => `${this.slug()}@aggTrade`);
+  private streamStatisticsPrice = computed(() => `${this.slug()}@ticker`);
 
   ngOnInit() {
     const chart = createChart(this.chartNode().nativeElement, {
@@ -91,19 +106,19 @@ export class DetailCryptoParsComponent implements OnInit {
   runWebsocket() {
     this.websocketService
       .connect(
-        `${this.slug()}@kline_${this.time()}/${this.slug()}@depth20@100ms/${this.slug()}@aggTrade`
+        `${this.streamCandle()}/${this.streamOrderBook()}/${this.streamAggTrade()}/${this.streamStatisticsPrice()}`
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        if (res.stream === `${this.slug()}@kline_${this.time()}`) {
-          console.log(res.stream);
+        if (res.stream === this.streamCandle()) {
           this.createChartCandles(res as IWebSocketData<ICandleChart>);
-        } else if (res.stream === `${this.slug()}@depth20@100ms`) {
+        } else if (res.stream === this.streamOrderBook()) {
           this.createOrderTable(res as IWebSocketData<IOrderBooK>);
-        } else if (res.stream === `${this.slug()}@aggTrade`) {
+        } else if (res.stream === this.streamAggTrade()) {
           const aggData = res.data as IAggTrade;
-          console.log(res);
           this.aggData.set(aggData);
+        } else {
+          this.statisticsPrice24h.set(res.data as IStatisticsPrice24h);
         }
       });
   }
@@ -115,6 +130,20 @@ export class DetailCryptoParsComponent implements OnInit {
   }
 
   createOrderTable(res: IWebSocketData<IOrderBooK>) {
+    const asks = this.arrayAsks();
+    // if (asks.length) {
+    //   console.log('old', asks);
+
+    //   console.log('new', res.data.a);
+    // }
+
+    // console.log(res.data.a[0]);
+    // console.log(this.arrayAsks());
+    // console.log(this.arrayAsks()[0][0]);
+    // if (this.arrayAsks()) {
+    //   console.log(this.arrayAsks()[0]?.[0]);
+    // }
+    // console.log(res.data.a);
     this.arrayAsks.set(res.data.a);
   }
 
@@ -140,11 +169,5 @@ export class DetailCryptoParsComponent implements OnInit {
     this.emaSeries()?.update(lastEma);
     this.smaSeries()?.update(lastSma);
     this.candleSeries()?.update(candle);
-  }
-  showPlaceholder(loadingData: boolean) {
-    if (loadingData) {
-      return 'placeholder col-12 bg-secondary';
-    }
-    return null;
   }
 }

@@ -65,6 +65,27 @@ export interface IAggTrade {
   m: boolean;
 }
 
+export interface IStatisticsPrice24h {
+  e: string;
+  E: number;
+  s: string;
+  p: string;
+  P: string;
+  w: string;
+  c: string;
+  Q: string;
+  o: string;
+  h: string;
+  l: string;
+  v: string;
+  q: string;
+  O: number;
+  C: number;
+  F: number;
+  L: number;
+  n: number;
+}
+
 export interface K {
   t: number;
   T: number;
