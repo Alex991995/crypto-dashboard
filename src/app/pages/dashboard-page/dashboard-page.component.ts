@@ -30,6 +30,7 @@ import {
 } from '@angular/forms';
 import { tableHeaders } from 'app/shared/constants/table-headers';
 import { Router } from '@angular/router';
+import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.component';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -39,6 +40,7 @@ import { Router } from '@angular/router';
     CommonModule,
     InputDashboard,
     ReactiveFormsModule,
+    ToggleThemeComponent,
   ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',

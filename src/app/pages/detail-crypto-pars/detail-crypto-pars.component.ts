@@ -36,6 +36,8 @@ import { calculateEMA } from './helpers/calculate-ema';
 import { calculateMovingAverageSeriesData } from './helpers/calculate-moving-average-series-data';
 import { AggTableTransactionComponent } from 'app/features/detail-tables/agg-table-transaction/agg-table-transaction.component';
 import { StatisticsPriceTableComponent } from 'app/features/detail-tables/statistics-price-table/statistics-price-table.component';
+import { from, pairwise } from 'rxjs';
+import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.component';
 
 @Component({
   selector: 'app-detail-crypto-pars',
@@ -43,6 +45,7 @@ import { StatisticsPriceTableComponent } from 'app/features/detail-tables/statis
     FormsModule,
     AggTableTransactionComponent,
     StatisticsPriceTableComponent,
+    ToggleThemeComponent,
   ],
   templateUrl: './detail-crypto-pars.component.html',
   styleUrl: './detail-crypto-pars.component.scss',
@@ -130,20 +133,12 @@ export class DetailCryptoParsComponent implements OnInit {
   }
 
   createOrderTable(res: IWebSocketData<IOrderBooK>) {
-    const asks = this.arrayAsks();
-    // if (asks.length) {
-    //   console.log('old', asks);
+    const asks$ = from(res.data.a);
 
-    //   console.log('new', res.data.a);
-    // }
+    asks$.pipe(pairwise()).subscribe((res) => {
+      // console.log(res);
+    });
 
-    // console.log(res.data.a[0]);
-    // console.log(this.arrayAsks());
-    // console.log(this.arrayAsks()[0][0]);
-    // if (this.arrayAsks()) {
-    //   console.log(this.arrayAsks()[0]?.[0]);
-    // }
-    // console.log(res.data.a);
     this.arrayAsks.set(res.data.a);
   }
 

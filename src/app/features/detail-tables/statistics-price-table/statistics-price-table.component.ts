@@ -15,10 +15,19 @@ import { IStatisticsPrice24h } from '@pages/detail-crypto-pars/model';
         </tr>
       </thead>
       <tbody class="table-group-divider">
-        <tr>
-          <td>{{ statisticsPrice24h()?.h }}</td>
-          <td>{{ statisticsPrice24h()?.l }}</td>
-          <td>{{ statisticsPrice24h()?.v }}</td>
+        <tr class="placeholder-glow">
+          <td>
+            {{ statisticsPrice24h()?.h }}
+            <span [class]="showPlaceholder(!statisticsPrice24h())"></span>
+          </td>
+          <td>
+            {{ statisticsPrice24h()?.l }}
+            <span [class]="showPlaceholder(!statisticsPrice24h())"></span>
+          </td>
+          <td>
+            {{ statisticsPrice24h()?.v }}
+            <span [class]="showPlaceholder(!statisticsPrice24h())"></span>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -26,4 +35,11 @@ import { IStatisticsPrice24h } from '@pages/detail-crypto-pars/model';
 })
 export class StatisticsPriceTableComponent {
   statisticsPrice24h = input<IStatisticsPrice24h | undefined>(undefined);
+
+  showPlaceholder(loadingData: boolean) {
+    if (loadingData) {
+      return 'placeholder col-12 bg-secondary';
+    }
+    return null;
+  }
 }

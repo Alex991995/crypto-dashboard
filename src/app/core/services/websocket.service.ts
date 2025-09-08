@@ -8,9 +8,8 @@ import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 export class WebsocketService {
   private socket$?: WebSocketSubject<any>;
   private readonly url = 'wss://fstream.binance.com/stream?';
-  // wss://fstream.binance.com/stream?streams=bnbusdt@aggTrade/btcusdt@markPrice
+
   connect(stream: string) {
-    console.log(stream);
     this.socket$ = webSocket(`${this.url}streams=${stream}`);
     return this.socket$ as WebSocketSubject<IWebSocketData<unknown>>;
   }
