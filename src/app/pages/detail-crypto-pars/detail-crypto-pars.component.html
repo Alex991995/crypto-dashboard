@@ -1,4 +1,4 @@
-<section class="d-flex justify-content-evenly">
+<section class="d-flex justify-content-evenly mt-3">
   <app-toggle-theme />
   <div class="d-flex flex-column align-items-end gap-4 flex-column">
     <div class="wrap-select">
@@ -19,43 +19,16 @@
       <app-statistics-price-table [statisticsPrice24h]="statisticsPrice24h()" />
     </div>
   </div>
-  <table class="table-sm table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Asks</th>
-        <th scope="col">Volume</th>
-      </tr>
-    </thead>
-    <tbody class="table-group-divider">
-      @for (asks of arrayAsks(); track $index) {
-      <tr>
-        <td class="flash-red">{{ asks[0] }}</td>
-        <td>{{ asks[1] }}</td>
-      </tr>
-      }
-    </tbody>
-  </table>
 
-  <!-- <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Bids</th>
-        <th scope="col">Volume</th>
-      </tr>
-    </thead>
-    <tbody class="table-group-divider">
-      <tr>
-        <td>Mark</td>
-        <td>Otto</td>
-      </tr>
-      <tr>
-        <td>Jacob</td>
-        <td>Thornton</td>
-      </tr>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-      </tr>
-    </tbody>
-  </table> -->
+  <app-order-book
+    firstHeaderTable="Asks"
+    secondHeaderTable="Volume"
+    [arrayData]="arrayAsks()"
+  />
+
+  <app-order-book
+    firstHeaderTable="Bids"
+    secondHeaderTable="Volume"
+    [arrayData]="arrayBids()"
+  />
 </section>

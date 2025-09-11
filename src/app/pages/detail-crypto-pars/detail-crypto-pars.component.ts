@@ -8,12 +8,14 @@ import {
   OnInit,
   signal,
   viewChild,
+  WritableSignal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { WebsocketService } from '@core/services/websocket.service';
 import {
   CandlestickType,
   IAggTrade,
+  IBidAskSpread,
   ICandle,
   ICandleChart,
   IOrderBooK,
@@ -36,8 +38,9 @@ import { calculateEMA } from './helpers/calculate-ema';
 import { calculateMovingAverageSeriesData } from './helpers/calculate-moving-average-series-data';
 import { AggTableTransactionComponent } from 'app/features/detail-tables/agg-table-transaction/agg-table-transaction.component';
 import { StatisticsPriceTableComponent } from 'app/features/detail-tables/statistics-price-table/statistics-price-table.component';
-import { from, pairwise } from 'rxjs';
 import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.component';
+import { OrderBookComponent } from 'app/features/detail-tables/order-book/order-book.component';
+import { SaveFavoriteCryptoParsService } from '@core/services/save-favorite-crypto-pars.service';
 
 @Component({
   selector: 'app-detail-crypto-pars',
@@ -46,6 +49,7 @@ import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.comp
     AggTableTransactionComponent,
     StatisticsPriceTableComponent,
     ToggleThemeComponent,
+    OrderBookComponent,
   ],
   templateUrl: './detail-crypto-pars.component.html',
   styleUrl: './detail-crypto-pars.component.scss',
@@ -61,7 +65,8 @@ export class DetailCryptoParsComponent implements OnInit {
   protected time = signal('1m');
   protected arrayTimeCandle = signal(arrayTimeCandle).asReadonly();
 
-  protected arrayAsks = signal<string[][]>([]);
+  protected arrayAsks = signal<IBidAskSpread[]>([]);
+  protected arrayBids = signal<IBidAskSpread[]>([]);
   public aggData = signal<IAggTrade | undefined>(undefined);
   protected statisticsPrice24h = signal<IStatisticsPrice24h | undefined>(
     undefined
@@ -133,13 +138,58 @@ export class DetailCryptoParsComponent implements OnInit {
   }
 
   createOrderTable(res: IWebSocketData<IOrderBooK>) {
-    const asks$ = from(res.data.a);
+    if (this.arrayAsks().length === 0) {
+      this.setFirstDataInBidAskPrice(res, this.arrayAsks);
+    } else {
+      this.changeOnNewBidAskPrice(res.data.a, this.arrayAsks);
+    }
 
-    asks$.pipe(pairwise()).subscribe((res) => {
-      // console.log(res);
+    if (this.arrayBids().length === 0) {
+      this.setFirstDataInBidAskPrice(res, this.arrayBids);
+    } else {
+      this.changeOnNewBidAskPrice(res.data.b, this.arrayBids);
+    }
+  }
+
+  setFirstDataInBidAskPrice(
+    res: IWebSocketData<IOrderBooK>,
+    arrayBidOrAsk: WritableSignal<IBidAskSpread[]>
+  ) {
+    const firstData = res.data.a.map((item) => ({
+      oldValue: null,
+      newValue: item[0],
+      volume: item[1],
+      'class-animation': null,
+    }));
+    arrayBidOrAsk.set(firstData);
+  }
+
+  changeOnNewBidAskPrice(
+    stream: string[][],
+    arrayBidOrAsk: WritableSignal<IBidAskSpread[]>
+  ) {
+    arrayBidOrAsk.update((prev) => {
+      return prev.map((oldData, i) => {
+        const newPrice = stream[i][0];
+        const newVolume = stream[i][1];
+        if (newPrice !== oldData.newValue) {
+          const newObj: IBidAskSpread = {
+            oldValue: oldData.newValue,
+            newValue: newPrice,
+            volume: newVolume,
+            'class-animation': '',
+          };
+          if (newPrice < oldData.newValue) {
+            newObj['class-animation'] = 'flash-red';
+          } else {
+            newObj['class-animation'] = 'flash-green';
+          }
+          return newObj;
+        }
+
+        return oldData;
+      });
     });
-
-    this.arrayAsks.set(res.data.a);
   }
 
   createChartCandles(res: IWebSocketData<ICandleChart>) {

@@ -12,6 +12,14 @@ import {
   WhitespaceData,
 } from 'lightweight-charts';
 
+export interface  IBidAskSpread {
+  oldValue: string | null;
+  newValue: string;
+  volume: string;
+  'class-animation': string | null;
+}
+
+
 export type CandlestickType = ISeriesApi<
   'Candlestick',
   Time,

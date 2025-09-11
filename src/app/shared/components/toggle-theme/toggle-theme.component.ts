@@ -14,7 +14,6 @@ export class ToggleThemeComponent {
   protected checkbox = this.isChecked;
 
   changeEventCheckbox() {
-    console.log(this.checkbox);
     this.managerThemeService.switchTheme(this.checkbox);
   }
 }

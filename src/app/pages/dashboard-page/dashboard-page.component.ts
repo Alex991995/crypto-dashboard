@@ -31,6 +31,7 @@ import {
 import { tableHeaders } from 'app/shared/constants/table-headers';
 import { Router } from '@angular/router';
 import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.component';
+import { SaveFavoriteCryptoParsService } from '@core/services/save-favorite-crypto-pars.service';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -50,7 +51,7 @@ export class DashboardPageComponent implements OnInit {
   private apiService = inject(ApiService);
   private errorServiceService = inject(ErrorServiceService);
   private router = inject(Router);
-
+  private saveFavoriteCryptoParsService = inject(SaveFavoriteCryptoParsService);
   protected statisticsCryptoPairs = signal<IStatistic[]>([]);
   protected initialStatisticsCryptoPairs = signal<IStatistic[]>([]);
   protected loading = signal(false);
@@ -68,6 +69,24 @@ export class DashboardPageComponent implements OnInit {
       const target = res.target as HTMLElement;
       this.start.set(Math.floor(target.scrollTop / this.rowHeight()));
     });
+  }
+
+  addToFavorite(cryptoPairs: IStatistic) {
+    this.saveFavoriteCryptoParsService.saveCryptoPairs(cryptoPairs);
+  }
+
+  showLikedHeart(cryptoPairs: IStatistic) {
+    const savedCryptoPars =
+      this.saveFavoriteCryptoParsService.arrayFavoriteCryptoPars();
+    const foundCryptoPars = savedCryptoPars.find(
+      (item) => item.symbol === cryptoPairs.symbol
+    );
+
+    if (foundCryptoPars) {
+      return 'bi bi-suit-heart-fill text-favorite';
+    } else {
+      return 'bi bi-suit-heart';
+    }
   }
 
   getSymbol(symbol: string) {
