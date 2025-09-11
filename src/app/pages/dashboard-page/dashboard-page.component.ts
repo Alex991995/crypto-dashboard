@@ -29,13 +29,14 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { tableHeaders } from 'app/shared/constants/table-headers';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.component';
 import { SaveFavoriteCryptoParsService } from '@core/services/save-favorite-crypto-pars.service';
 
 @Component({
   selector: 'app-dashboard-page',
   imports: [
+    RouterLink,
     Loader,
     SlicePipe,
     CommonModule,
@@ -59,6 +60,7 @@ export class DashboardPageComponent implements OnInit {
   protected start = signal(0);
   protected rowHeight = signal(40);
   protected visibleRows = signal(10);
+  // getSavedCrypto = localStorage.getItem('favorite-crypto') || '[]';
 
   public filtersGroup = new FormGroup({
     checkboxes: new FormArray([new FormControl(false)]),
@@ -94,6 +96,10 @@ export class DashboardPageComponent implements OnInit {
   }
 
   ngOnInit() {
+    // console.log(this.getSavedCrypto);
+
+    // const s = JSON.parse(this.getSavedCrypto);
+    // console.log(s);
     this.loading.set(true);
     this.apiService.getStatistics().subscribe({
       next: (value) => {

@@ -41,10 +41,12 @@ import { StatisticsPriceTableComponent } from 'app/features/detail-tables/statis
 import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.component';
 import { OrderBookComponent } from 'app/features/detail-tables/order-book/order-book.component';
 import { SaveFavoriteCryptoParsService } from '@core/services/save-favorite-crypto-pars.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-detail-crypto-pars',
   imports: [
+    RouterLink,
     FormsModule,
     AggTableTransactionComponent,
     StatisticsPriceTableComponent,
@@ -118,6 +120,7 @@ export class DetailCryptoParsComponent implements OnInit {
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
+        console.log(res);
         if (res.stream === this.streamCandle()) {
           this.createChartCandles(res as IWebSocketData<ICandleChart>);
         } else if (res.stream === this.streamOrderBook()) {

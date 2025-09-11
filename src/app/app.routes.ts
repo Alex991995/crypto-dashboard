@@ -15,4 +15,11 @@ export const routes: Routes = [
         (m) => m.DetailCryptoParsComponent
       ),
   },
+  {
+    path: 'favorite',
+    loadComponent: () =>
+      import('@pages/favorite/favorite.component').then(
+        (m) => m.FavoriteComponent
+      ),
+  },
 ];
