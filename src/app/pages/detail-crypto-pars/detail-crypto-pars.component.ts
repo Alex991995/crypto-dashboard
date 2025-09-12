@@ -254,10 +254,10 @@ export class DetailCryptoParsComponent implements OnInit {
 
     this.masData.update((item) => [
       ...item,
-      { close: +msg.c, time: msg.t as UTCTimestamp },
+      { close: +msg.c, time: (msg.t / 1000) as UTCTimestamp },
     ]);
 
-    const smaValues = calculateMovingAverageSeriesData(this.masData(), 14); // например, 14
+    const smaValues = calculateMovingAverageSeriesData(this.masData(), 14);
     const emaValues = calculateEMA(this.masData(), 14);
 
     const lastSma = smaValues[smaValues.length - 1];
