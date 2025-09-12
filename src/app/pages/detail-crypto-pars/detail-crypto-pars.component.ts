@@ -2,6 +2,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   ElementRef,
   inject,
   input,
@@ -18,6 +19,7 @@ import {
   IBidAskSpread,
   ICandle,
   ICandleChart,
+  IHistoryCandle,
   IOrderBooK,
   ISmaSeries,
   IStatisticsPrice24h,
@@ -42,6 +44,7 @@ import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.comp
 import { OrderBookComponent } from 'app/features/detail-tables/order-book/order-book.component';
 import { SaveFavoriteCryptoParsService } from '@core/services/save-favorite-crypto-pars.service';
 import { RouterLink } from '@angular/router';
+import { ApiService } from '@core/services/api.service';
 
 @Component({
   selector: 'app-detail-crypto-pars',
@@ -59,6 +62,8 @@ import { RouterLink } from '@angular/router';
 export class DetailCryptoParsComponent implements OnInit {
   private websocketService = inject(WebsocketService);
   private destroyRef = inject(DestroyRef);
+  private apiService = inject(ApiService);
+
   protected slug = input.required<string>();
   private candleSeries = signal<CandlestickType | undefined>(undefined);
   private smaSeries = signal<ISmaSeries | undefined>(undefined);
@@ -78,11 +83,25 @@ export class DetailCryptoParsComponent implements OnInit {
   private streamOrderBook = computed(() => `${this.slug()}@depth20@100ms`);
   private streamAggTrade = computed(() => `${this.slug()}@aggTrade`);
   private streamStatisticsPrice = computed(() => `${this.slug()}@ticker`);
+  private masData = signal<ICandle[]>([]);
 
   ngOnInit() {
     const chart = createChart(this.chartNode().nativeElement, {
       width: 600,
       height: 400,
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+      },
+      localization: {
+        timeFormatter: (time: number) => {
+          return new Date(time * 1000).toLocaleDateString('ru-RU', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          });
+        },
+      },
     });
     const candleSeries = chart.addSeries(CandlestickSeries, {
       upColor: '#26a69a',
@@ -100,17 +119,46 @@ export class DetailCryptoParsComponent implements OnInit {
       color: 'red',
       lineWidth: 2,
     });
-
+    this.getHistoryCandles();
     this.smaSeries.set(smaSeries);
     this.emaSeries.set(emaSeries);
     this.candleSeries.set(candleSeries);
+
     this.runWebsocket();
   }
 
   changeEventSelector() {
     this.websocketService.close();
+    this.getHistoryCandles();
     this.runWebsocket();
     this.resetAllWebsocketData();
+  }
+
+  getHistoryCandles() {
+    this.apiService
+      .getHistoryCandles(this.slug(), this.time())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        const arrayIndicators = res.map((item) => ({
+          close: parseFloat(item[4]),
+          time: Math.floor(item[0] / 1000) as UTCTimestamp,
+        }));
+        this.masData.set(arrayIndicators);
+
+        const candles = res.map((d) => ({
+          time: Math.floor(d[0] / 1000) as UTCTimestamp,
+          open: parseFloat(d[1]),
+          high: parseFloat(d[2]),
+          low: parseFloat(d[3]),
+          close: parseFloat(d[4]),
+        }));
+        this.candleSeries()?.setData(candles);
+      });
+    const smaValues = calculateMovingAverageSeriesData(this.masData(), 14);
+    const emaValues = calculateEMA(this.masData(), 14);
+
+    this.smaSeries()?.setData(smaValues);
+    this.emaSeries()?.setData(emaValues);
   }
 
   runWebsocket() {
@@ -120,7 +168,6 @@ export class DetailCryptoParsComponent implements OnInit {
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        console.log(res);
         if (res.stream === this.streamCandle()) {
           this.createChartCandles(res as IWebSocketData<ICandleChart>);
         } else if (res.stream === this.streamOrderBook()) {
@@ -198,19 +245,21 @@ export class DetailCryptoParsComponent implements OnInit {
   createChartCandles(res: IWebSocketData<ICandleChart>) {
     const msg = res.data.k;
     const candle = {
-      time: new Date(msg.t).toISOString().split('T')[0],
+      time: Math.floor(msg.t / 1000) as UTCTimestamp, //
       open: parseFloat(msg.o),
       high: parseFloat(msg.h),
       low: parseFloat(msg.l),
       close: parseFloat(msg.c),
     };
 
-    const masData: ICandle[] = [];
-    masData.push({ close: +msg.c, time: msg.t as UTCTimestamp });
+    this.masData.update((item) => [
+      ...item,
+      { close: +msg.c, time: msg.t as UTCTimestamp },
+    ]);
 
-    const smaValues = calculateMovingAverageSeriesData(masData, 1);
+    const smaValues = calculateMovingAverageSeriesData(this.masData(), 14); // например, 14
+    const emaValues = calculateEMA(this.masData(), 14);
 
-    const emaValues = calculateEMA(masData, 1);
     const lastSma = smaValues[smaValues.length - 1];
     const lastEma = emaValues[emaValues.length - 1];
 

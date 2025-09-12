@@ -9,16 +9,16 @@ import {
   LineStyleOptions,
   SeriesOptionsCommon,
   Time,
+  UTCTimestamp,
   WhitespaceData,
 } from 'lightweight-charts';
 
-export interface  IBidAskSpread {
+export interface IBidAskSpread {
   oldValue: string | null;
   newValue: string;
   volume: string;
   'class-animation': string | null;
 }
-
 
 export type CandlestickType = ISeriesApi<
   'Candlestick',
@@ -115,6 +115,21 @@ export interface K {
 }
 
 export interface ICandle {
-  time: number;
+  time: UTCTimestamp;
   close: number;
 }
+
+export type IHistoryCandle = [
+  number,
+  string,
+  string,
+  string,
+  string,
+  string,
+  number,
+  string,
+  number,
+  string,
+  string,
+  string
+];

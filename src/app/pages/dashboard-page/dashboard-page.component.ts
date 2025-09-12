@@ -96,10 +96,6 @@ export class DashboardPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    // console.log(this.getSavedCrypto);
-
-    // const s = JSON.parse(this.getSavedCrypto);
-    // console.log(s);
     this.loading.set(true);
     this.apiService.getStatistics().subscribe({
       next: (value) => {
