@@ -92,6 +92,8 @@ export class DetailCryptoParsComponent implements OnInit {
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
+        rightOffset: 0,
+        fixRightEdge: true,
       },
       localization: {
         timeFormatter: (time: number) => {
