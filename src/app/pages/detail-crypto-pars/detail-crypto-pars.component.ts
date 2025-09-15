@@ -2,7 +2,6 @@ import {
   Component,
   computed,
   DestroyRef,
-  effect,
   ElementRef,
   inject,
   input,
@@ -19,7 +18,6 @@ import {
   IBidAskSpread,
   ICandle,
   ICandleChart,
-  IHistoryCandle,
   IOrderBooK,
   ISmaSeries,
   IStatisticsPrice24h,
@@ -29,10 +27,8 @@ import {
 import {
   CandlestickSeries,
   createChart,
-  LineData,
   LineSeries,
   UTCTimestamp,
-  WhitespaceData,
 } from 'lightweight-charts';
 import { arrayTimeCandle } from 'app/shared/constants/arrayTimeCandle';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -40,20 +36,15 @@ import { calculateEMA } from './helpers/calculate-ema';
 import { calculateMovingAverageSeriesData } from './helpers/calculate-moving-average-series-data';
 import { AggTableTransactionComponent } from 'app/features/detail-tables/agg-table-transaction/agg-table-transaction.component';
 import { StatisticsPriceTableComponent } from 'app/features/detail-tables/statistics-price-table/statistics-price-table.component';
-import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.component';
 import { OrderBookComponent } from 'app/features/detail-tables/order-book/order-book.component';
-import { SaveFavoriteCryptoParsService } from '@core/services/save-favorite-crypto-pars.service';
-import { RouterLink } from '@angular/router';
 import { ApiService } from '@core/services/api.service';
 
 @Component({
   selector: 'app-detail-crypto-pars',
   imports: [
-    RouterLink,
     FormsModule,
     AggTableTransactionComponent,
     StatisticsPriceTableComponent,
-    ToggleThemeComponent,
     OrderBookComponent,
   ],
   templateUrl: './detail-crypto-pars.component.html',

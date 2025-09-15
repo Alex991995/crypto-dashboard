@@ -36,13 +36,11 @@ import { SaveFavoriteCryptoParsService } from '@core/services/save-favorite-cryp
 @Component({
   selector: 'app-dashboard-page',
   imports: [
-    RouterLink,
     Loader,
     SlicePipe,
     CommonModule,
     InputDashboard,
     ReactiveFormsModule,
-    ToggleThemeComponent,
   ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
@@ -60,7 +58,6 @@ export class DashboardPageComponent implements OnInit {
   protected start = signal(0);
   protected rowHeight = signal(40);
   protected visibleRows = signal(10);
-  // getSavedCrypto = localStorage.getItem('favorite-crypto') || '[]';
 
   public filtersGroup = new FormGroup({
     checkboxes: new FormArray([new FormControl(false)]),
