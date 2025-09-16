@@ -1,6 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IStatistic } from 'app/interfaces';
+import { IStatistic } from 'app/shared/interfaces';
 
 @Component({
   selector: 'app-input-dashboard',

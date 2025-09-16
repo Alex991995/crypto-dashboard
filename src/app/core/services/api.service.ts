@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { IHistoryCandle } from '@pages/detail-crypto-pars/model';
-import { IStatistic } from 'app/interfaces';
+import { IStatistic } from 'app/shared/interfaces';
 
 @Injectable({
   providedIn: 'root',

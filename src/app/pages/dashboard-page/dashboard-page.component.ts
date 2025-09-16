@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { ApiService } from '@core/services/api.service';
 import { ErrorServiceService } from '@core/services/error-service.service';
-import { IStatistic } from 'app/interfaces';
+import { IStatistic } from 'app/shared/interfaces';
 import { fromEvent } from 'rxjs';
 import { Loader } from '@components/loader/loader.component';
 import { SlicePipe } from '@angular/common';

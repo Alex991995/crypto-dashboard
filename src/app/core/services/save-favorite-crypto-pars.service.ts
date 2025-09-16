@@ -1,5 +1,5 @@
 import { Injectable, OnInit, signal } from '@angular/core';
-import { IStatistic } from 'app/interfaces';
+import { IStatistic } from 'app/shared/interfaces';
 
 @Injectable({
   providedIn: 'root',
