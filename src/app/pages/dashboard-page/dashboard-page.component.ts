@@ -1,20 +1,16 @@
 import {
   Component,
-  computed,
+  DestroyRef,
   ElementRef,
   inject,
   OnInit,
-  output,
-  QueryList,
   signal,
   ViewChild,
-  viewChild,
-  ViewChildren,
 } from '@angular/core';
 import { ApiService } from '@core/services/api.service';
 import { ErrorServiceService } from '@core/services/error-service.service';
 import { IStatistic } from 'app/interfaces';
-import { first, fromEvent, map, take } from 'rxjs';
+import { fromEvent } from 'rxjs';
 import { Loader } from '@components/loader/loader.component';
 import { SlicePipe } from '@angular/common';
 import { columnSort } from '@pages/dashboard-page/model';
@@ -25,13 +21,12 @@ import {
   FormArray,
   FormControl,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
 import { tableHeaders } from 'app/shared/constants/table-headers';
-import { Router, RouterLink } from '@angular/router';
-import { ToggleThemeComponent } from '@components/toggle-theme/toggle-theme.component';
+import { Router } from '@angular/router';
 import { SaveFavoriteCryptoParsService } from '@core/services/save-favorite-crypto-pars.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -51,6 +46,8 @@ export class DashboardPageComponent implements OnInit {
   private errorServiceService = inject(ErrorServiceService);
   private router = inject(Router);
   private saveFavoriteCryptoParsService = inject(SaveFavoriteCryptoParsService);
+  private destroyRef = inject(DestroyRef);
+
   protected statisticsCryptoPairs = signal<IStatistic[]>([]);
   protected initialStatisticsCryptoPairs = signal<IStatistic[]>([]);
   protected loading = signal(false);
@@ -64,10 +61,12 @@ export class DashboardPageComponent implements OnInit {
   });
 
   ngAfterViewInit() {
-    fromEvent(this.rootRef.nativeElement, 'scroll').subscribe((res) => {
-      const target = res.target as HTMLElement;
-      this.start.set(Math.floor(target.scrollTop / this.rowHeight()));
-    });
+    fromEvent(this.rootRef.nativeElement, 'scroll')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        const target = res.target as HTMLElement;
+        this.start.set(Math.floor(target.scrollTop / this.rowHeight()));
+      });
   }
 
   addToFavorite(cryptoPairs: IStatistic) {
@@ -94,17 +93,20 @@ export class DashboardPageComponent implements OnInit {
 
   ngOnInit() {
     this.loading.set(true);
-    this.apiService.getStatistics().subscribe({
-      next: (value) => {
-        this.statisticsCryptoPairs.set(value);
-        this.initialStatisticsCryptoPairs.set(value);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.errorServiceService.setError(err);
-        this.loading.set(false);
-      },
-    });
+    this.apiService
+      .getStatistics()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (value) => {
+          this.statisticsCryptoPairs.set(value);
+          this.initialStatisticsCryptoPairs.set(value);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.errorServiceService.setError(err);
+          this.loading.set(false);
+        },
+      });
   }
 
   handlerCheckboxEvent() {
