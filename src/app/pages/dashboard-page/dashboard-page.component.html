@@ -1,0 +1,72 @@
+<section class="container mt-3">
+  <div class="d-flex justify-content-between align-items-center">
+    <app-input-dashboard
+      [statisticsCryptoPairs]="statisticsCryptoPairs()"
+      (symbol)="getSymbol($event)"
+    />
+
+    <form [formGroup]="filtersGroup">
+      <ng-component formArrayName="checkboxes">
+        <div class="form-check">
+          <input
+            formControlName="0"
+            class="form-check-input"
+            name="number-transactions"
+            type="checkbox"
+            id="checkDefault"
+            (change)="handlerCheckboxEvent()"
+          />
+          <label class="form-check-label" for="checkDefault">
+            Number of transactions
+          </label>
+        </div>
+      </ng-component>
+    </form>
+  </div>
+  <div
+    class="mt-5 position-relative"
+    #rootRef
+    [style]="{
+      height: rowHeight() * visibleRows() + 1 + 'px',
+      overflow: 'auto'
+    }"
+  >
+    @if(loading()){
+    <app-loader />
+
+    } @else {
+    <div [style.height]="getTopHeight + 'px'"></div>
+
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          @for (header of tableHeaders(); track $index) {
+          <th (click)="sortTable(header.columnName)">
+            {{ header.text }}
+            <i [class]="chosenSortedIcon(header.isSorted)"></i>
+          </th>
+          }
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        @for (cryptoPairs of statisticsCryptoPairs() | slice: start() : start()
+        + visibleRows() + 1; track cryptoPairs.firstId) {
+        <tr>
+          <th>
+            {{ cryptoPairs.symbol }}
+            <i
+              (click)="addToFavorite(cryptoPairs)"
+              [class]="showLikedHeart(cryptoPairs)"
+            ></i>
+          </th>
+          <td>{{ cryptoPairs.lastPrice }}</td>
+          <td>{{ cryptoPairs.priceChangePercent }}</td>
+          <td>{{ cryptoPairs.volume }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <div [style.height]="getBottomHeight + 'px'"></div>
+    }
+  </div>
+</section>

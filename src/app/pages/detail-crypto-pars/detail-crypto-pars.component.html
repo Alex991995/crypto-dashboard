@@ -1,0 +1,33 @@
+<section class="d-flex justify-content-evenly mt-3">
+  <div class="d-flex flex-column align-items-end gap-4 flex-column">
+    <div class="wrap-select">
+      <select
+        class="form-select"
+        [(ngModel)]="time"
+        (change)="changeEventSelector()"
+      >
+        @for (item of arrayTimeCandle(); track $index) {
+        <option [value]="item">{{ item }}</option>
+
+        }
+      </select>
+    </div>
+    <div #chart></div>
+    <div class="d-flex gap-3">
+      <app-agg-table-transaction [aggData]="aggData()" />
+      <app-statistics-price-table [statisticsPrice24h]="statisticsPrice24h()" />
+    </div>
+  </div>
+
+  <app-order-book
+    firstHeaderTable="Asks"
+    secondHeaderTable="Volume"
+    [arrayData]="arrayAsks()"
+  />
+
+  <app-order-book
+    firstHeaderTable="Bids"
+    secondHeaderTable="Volume"
+    [arrayData]="arrayBids()"
+  />
+</section>

@@ -1,0 +1,33 @@
+<div>
+  <h4>Recent aggregated transactions</h4>
+  <table class="table-sm">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Side</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr [class]="aggData()?.m ? 'text-danger' : 'text-success'">
+        <td class="placeholder-glow">
+          <span [class]="skeleton(!aggData())"></span>
+          {{ aggData()?.T | date : "HH:mm:ss" }}
+        </td>
+
+        <td class="placeholder-glow">
+          <span [class]="skeleton(!aggData())"></span>
+          {{ aggData()?.p }}
+        </td>
+        <td class="placeholder-glow">
+          <span [class]="skeleton(!aggData())"></span>
+          {{ aggData()?.q }}
+        </td>
+        <td>
+          {{ aggData()?.m ? "Sell" : "Buy" }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
