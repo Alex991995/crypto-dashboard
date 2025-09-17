@@ -1,5 +1,6 @@
 # CryptoDashboard
 Angular
+
 npm start
 
 An app for displaying information about crypto pairs.
